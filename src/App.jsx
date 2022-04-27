@@ -1,69 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import { ChildArea } from "./components/ChildArea";
 import "./style.css";
-import { InputTodo } from "./components/InputTodo";
-import { IncompleteTodos } from "./components/IncompleteTodos";
-import { CompleteTodos } from "./components/CompleteTodos";
 
 export const App = () => {
-  const [todoText, setTodoText] = useState("");
-  const [incompleteTodos, setIncompleteTodos] = useState([]);
-  const [completeTodos, setCompleteTodos] = useState([]);
+  const [text, setText] = useState("");
+  const [open, setOpen] = useState(false);
 
-  const onChangeTodoText = (event) => setTodoText(event.target.value);
-
-  const onClickAdd = () => {
-    if (todoText === "") return;
-    const newTodos = [...incompleteTodos, todoText];
-    setIncompleteTodos(newTodos);
-    setTodoText("");
+  const onChangeText = (e) => {
+    setText(e.target.value);
   };
 
-  const onClickDelete = (index) => {
-    const newTodos = [...incompleteTodos];
-    newTodos.splice(index, 1);
-    setIncompleteTodos(newTodos);
-  };
+  const onClickOpen = () => setOpen(!open);
 
-  const onClickComplete = (index) => {
-    const newIncompleteTodos = [...incompleteTodos];
-    newIncompleteTodos.splice(index, 1);
-
-    const newCompleteTodos = [...completeTodos, incompleteTodos[index]];
-
-    setIncompleteTodos(newIncompleteTodos);
-    setCompleteTodos(newCompleteTodos);
-  };
-
-  const onClickBack = (index) => {
-    const newCompleteTodos = [...completeTodos];
-    newCompleteTodos.splice(index, 1);
-
-    const newIncompleteTodos = [...incompleteTodos, completeTodos[index]];
-
-    setIncompleteTodos(newIncompleteTodos);
-    setCompleteTodos(newCompleteTodos);
-  };
+  const onClickClose = useCallback(() => setOpen(false), [setOpen]);
 
   return (
-    <>
-      <InputTodo
-        todoText={todoText}
-        onChange={onChangeTodoText}
-        onClick={onClickAdd}
-        disabled={incompleteTodos.length >= 5}
-      />
-      {incompleteTodos.length >= 5 && (
-        <p style={{ color: "red" }}>
-          登録できるTodoは5個までです。消化してください。
-        </p>
-      )}
-
-      <IncompleteTodos
-        incompleteTodos={incompleteTodos}
-        onClickComplete={onClickComplete}
-        onClickDelete={onClickDelete}
-      />
-      <CompleteTodos todos={completeTodos} onClick={onClickBack} />
-    </>
+    <div className="App">
+      <input value={text} onChange={onChangeText} />
+      <br />
+      <br />
+      <button onClick={onClickOpen}>表示</button>
+      <ChildArea open={open} onClickClose={onClickClose} />
+    </div>
   );
 };
